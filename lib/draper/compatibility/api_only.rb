@@ -11,12 +11,12 @@ module Draper
     # for more detail: https://github.com/rails/rails/issues/27211). This hack is meant to be a
     # temporary solution until we can find a way to not rely on the controller layer.
     module ApiOnly
-      extend ActiveSupport::Concern
-
-      included do
-        alias :previous_render_to_body :render_to_body
-        include ActionView::Rendering
-        alias :render_to_body :previous_render_to_body
+      def view_context
+        @view_context ||= begin
+          Class.new(ActionView::Base) {
+            include Rails.application.routes.url_helpers
+          }.new
+        end
       end
     end
   end
